@@ -79,9 +79,15 @@ list = JSON.parse(list);
       }
 
       await page.type("#personName", list[i].employees[j].name, { delay: 50 });
-      await page.type("#designation", list[i].employees[j].designation, {
-        delay: 50,
-      });
+
+      if (list[i].employees[j].designation === "") {
+        console.log("Designation not added, Please add designation");
+      } else {
+        await page.type("#designation", list[i].employees[j].designation, {
+          delay: 50,
+        });
+      }
+
       if (list[i].employees[j].phone !== "") {
         await page.type("#phone", list[i].employees[j].phone, { delay: 50 });
       }
@@ -92,6 +98,7 @@ list = JSON.parse(list);
 
       await page.click(saveBtnDmk);
       await page.waitForNetworkIdle();
+      await page.waitForNetworkIdle();
 
       console.log(
         `${j + 1} of ${list[i].employees.length} of ${
@@ -99,10 +106,11 @@ list = JSON.parse(list);
         } added successfully`
       );
     }
-    console.log(`${list[i].buyerName} added successfully`);
-    console.log(`---------------------------------------`);
     await page.click(filterRemoveBtn);
     await page.waitForNetworkIdle();
+    await page.waitForNetworkIdle();
+    console.log(`${list[i].buyerName} added successfully`);
+    console.log(`---------------------------------------`);
   }
 
   console.log("Congratulation! You have done your job successfully!");
