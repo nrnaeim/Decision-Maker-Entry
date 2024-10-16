@@ -82,6 +82,7 @@ list = JSON.parse(list);
 
       if (list[i].employees[j].designation === "") {
         console.log("Designation not added, Please add designation");
+        break;
       } else {
         await page.type("#designation", list[i].employees[j].designation, {
           delay: 50,
