@@ -9,13 +9,12 @@ import {
   keyword,
   applyBtn,
   idS,
-  editBuyer,
-  saveEditbyr,
   addDeciMaker,
   saveBtnDmk,
   filterRemoveBtn,
   parentS,
   parentChoseS,
+  sideBar,
 } from "./selectors.js";
 
 let list = fs.readFileSync("./data.json", "utf-8");
@@ -37,6 +36,7 @@ list = JSON.parse(list);
   await page.waitForNetworkIdle();
   await page.goto("https://tenderbase.co.uk/tbadmin/buyers");
   await page.waitForNetworkIdle();
+  await page.click(sideBar); //closing side bar
   //Data processing
   for (let i = 0; i < list.length; i++) {
     await page.click(addFilterBtn);
@@ -48,21 +48,19 @@ list = JSON.parse(list);
       return items.map((item) => parseInt(item.textContent.trim()));
     });
     let index = ID.indexOf(parseInt(list[i].id));
-    let editBtn = `#listTable > tbody > tr:nth-child(${
+
+    let editBtn = `#listTable>tbody>tr:nth-child(${
       index + 1
-    }) > td:nth-child(11) > div > div > div > button`;
-    // await page.click(editBtn); //edit buyer or add dcmaker
-    // await page.click(editBuyer);
-    // await page.waitForNetworkIdle();
-    // await page.type("#decisionMakersUrl", list[i].decisionMakerUrl);
-    // await page.click(saveEditbyr);
-    // await page.waitForNetworkIdle();
+    })>td:nth-child(11)>div>div>div>button`;
 
     for (let j = 0; j < list[i].employees.length; j++) {
       await page.click(editBtn); //edit buyer or add dcmaker
-      await page.click(addDeciMaker);
-      await page.waitForNetworkIdle();
+      await page.waitForSelector(addDeciMaker);
+      await page.evaluate((addDeciMaker) => {
+        document.querySelector(addDeciMaker).click();
+      }, addDeciMaker);
 
+      await page.waitForNetworkIdle();
       if (list[i].employees[j].parent !== "") {
         await page.click(parentS);
         await page.waitForNetworkIdle();
@@ -73,7 +71,6 @@ list = JSON.parse(list);
             delay: 50,
           }
         );
-
         await page.waitForNetworkIdle();
         await page.click(parentChoseS);
       }
@@ -96,11 +93,8 @@ list = JSON.parse(list);
       if (list[i].employees[j].email !== "") {
         await page.type("#email", list[i].employees[j].email, { delay: 50 });
       }
-
       await page.click(saveBtnDmk);
       await page.waitForNetworkIdle();
-      await page.waitForNetworkIdle();
-
       console.log(
         `${j + 1} of ${list[i].employees.length} of ${
           list[i].buyerName
@@ -108,7 +102,6 @@ list = JSON.parse(list);
       );
     }
     await page.click(filterRemoveBtn);
-    await page.waitForNetworkIdle();
     await page.waitForNetworkIdle();
     console.log(`${list[i].buyerName} added successfully`);
     console.log(`---------------------------------------`);
