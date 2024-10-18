@@ -48,14 +48,17 @@ list = JSON.parse(list);
       return items.map((item) => parseInt(item.textContent.trim()));
     });
     let index = ID.indexOf(parseInt(list[i].id));
+    let editBtn;
 
-    let editBtn = `#listTable>tbody>tr:nth-child(${
-      index + 1
-    })>td:nth-child(11)>div>div>div>button`;
+    if (index !== -1) {
+      editBtn = `#listTable>tbody>tr:nth-child(${
+        index + 1
+      })>td:nth-child(11)>div>div>div>button`;
+    }
 
     for (let j = 0; j < list[i].employees.length; j++) {
+      await page.click(sideBar); //closing side bar
       await page.click(editBtn); //edit buyer or add dcmaker
-      await page.waitForSelector(addDeciMaker);
       await page.evaluate((addDeciMaker) => {
         document.querySelector(addDeciMaker).click();
       }, addDeciMaker);
